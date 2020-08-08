@@ -1,5 +1,4 @@
 import os
-#import fileinput
 from future.utils import iteritems
 import readline
 
@@ -24,6 +23,7 @@ def main():
 			main()
 
 def recombinator():
+    # Thank you to ShawnDEvans for hashmash, which is the basis for this portion of the script.
     readline.get_completer()
     readline.parse_and_bind("tab: complete")
     readline.set_completer_delims('\t\n=\\')
@@ -35,15 +35,17 @@ def recombinator():
     try:
         hash_file = raw_input("user:hash file? ")
         pass_file = raw_input("hash:pass file? ")
+	combOutFile = raw_input("Name of Output File? ")
     except IOError:
         print('[ERROR]\tInvalid input files, please review..')
         recombinator()
 
-    passDict = dict(line.split(':', -1) for line in pass_file)
-    hashes = hash_file.readlines()
+    passDict = dict(line.split(':') for line in open(pass_file))
+    hashes = open(hash_file, 'r')
+    f = hashes.readlines()
 
     for cracked_hash, passwd in iteritems(passDict):
-        for hashItem in hashes:
+        for hashItem in f:
             if len(hashItem) > 0:
                 hashList = hashItem.split(':')
                 if len(hashList) == 7 or len(hashList) == 4:
@@ -51,7 +53,11 @@ def recombinator():
                 else:
                     user_name, user_hash = (hashList[0], hashList[1])
                     if cracked_hash.upper().strip() == user_hash.upper().strip():
-                        print('%s:%s' % (user_name.strip(), passwd.strip()))
+			out = open(combOutFile, 'a')
+    	                out.write('%s:%s\n' % (user_name.strip(), passwd.strip()))
+    print("\n")
+    print("Done!")
+    quit()
 
 def secretsDumpMenu():
     readline.get_completer()
